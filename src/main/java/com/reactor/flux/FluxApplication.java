@@ -25,9 +25,9 @@ public class FluxApplication implements CommandLineRunner {
 
 		//----------------------------------------------------------------
 
-		// ERRORES
+		// ERRORES and  onComplete
 
-		Flux<String> names2 = Flux.just("Bladi2","","Claudia2","L2","Ivan2")
+		Flux<String> names2 = Flux.just("Bladi2","ff","Claudia2","L2","Ivan2")
 				.doOnNext(item -> {
 					if(item.isEmpty()){
 						throw new RuntimeException("There can be no empty names");
@@ -35,7 +35,13 @@ public class FluxApplication implements CommandLineRunner {
 					System.out.println(item);
 				});
 		names2.subscribe(logger::info,
-				error -> logger.error(error.getMessage()));
+				error -> logger.error(error.getMessage()),
+				new Runnable() {
+					@Override
+					public void run() {
+						logger.info("End execution flux");
+					}
+				});
 
 
 	}
