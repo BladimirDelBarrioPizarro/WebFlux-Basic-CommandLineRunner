@@ -25,15 +25,17 @@ public class FluxApplication implements CommandLineRunner {
 
 		//----------------------------------------------------------------
 
-		// ERRORES and  onComplete
+		// ERRORES and  onComplete Runnable // map
 
-		Flux<String> names2 = Flux.just("Bladi2","ff","Claudia2","L2","Ivan2")
+		Flux<String> names2 = Flux.just("Bladi2","Damian","Claudia2","L2","Ivan2")
+				.map(String::toUpperCase)
 				.doOnNext(item -> {
 					if(item.isEmpty()){
 						throw new RuntimeException("There can be no empty names");
 					}
 					System.out.println(item);
 				});
+
 		names2.subscribe(logger::info,
 				error -> logger.error(error.getMessage()),
 				new Runnable() {
@@ -43,6 +45,26 @@ public class FluxApplication implements CommandLineRunner {
 					}
 				});
 
+		//--------------------------------------------------
+		//map
+
+		Flux<User> names3 = Flux.just("Bladi2","Damian","Claudia2","L2","Ivan2")
+				.map(item -> new User(item.toLowerCase(),null))
+				.doOnNext(item -> {
+					if(item == null){
+						throw new RuntimeException("There can be no empty user");
+					}
+					System.out.println(item.getName());
+				});
+
+		names3.subscribe(item -> logger.info(item.toString()),
+				error -> logger.error(error.getMessage()),
+				new Runnable() {
+					@Override
+					public void run() {
+						logger.info("End execution flux");
+					}
+				});
 
 	}
 }
