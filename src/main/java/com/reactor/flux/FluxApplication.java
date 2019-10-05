@@ -23,7 +23,8 @@ public class FluxApplication implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 		//IniciationFlux();
 		//flatMapMethod();
-		mapperFlux();
+		//mapperFlux();
+		listToMonoList();
 	}
 
 	public List<String> userListMethod(){
@@ -205,9 +206,19 @@ public class FluxApplication implements CommandLineRunner {
 					}).subscribe(item -> logger.info(item.toString()));
 		}
 
+	//---------------------------------------------------------------------------------------
+	// Mappeo de lista de User a Mono User collectList() mostramos  usuario a usuario con forEach
 
+		public void listToMonoList(){
+			List<User> userList = userMethodList();
+			Flux.fromIterable(userList)
+					.collectList()
+					.subscribe(list -> {
+						list.forEach(item -> logger.info(item.toString()));
+					});
+		}
 
-
+	//---------------------------------------------------------------------------------------
 
 
 
