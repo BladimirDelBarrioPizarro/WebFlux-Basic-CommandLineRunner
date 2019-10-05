@@ -6,6 +6,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @SpringBootApplication
 public class FluxApplication implements CommandLineRunner {
@@ -17,7 +21,41 @@ public class FluxApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
+		//IniciationFlux();
+		//flatMapMethod();
+		mapperFlux();
+	}
 
+	public List<String> userListMethod(){
+		List<String> userList = new ArrayList<>();
+		userList.add("Bladi test");
+		userList.add("Eliamertix Fulano");
+		userList.add("Eliamertix Mengano");
+		userList.add("Claudia Sanchez");
+		userList.add("Bruce Willis");
+		userList.add("Bruce Pizarro");
+		return userList;
+	}
+
+	public List<User> userMethodList(){
+		List<User> userList = new ArrayList<>();
+		User user1 = new User("Bladi test","TestAdrressB");
+		User user2 = new User("Eliamertix Fulano","TestAdrressE1");
+		User user3 = new User("Eliamertix Mengano","TestAdrressE2");
+		User user4 = new User("Claudia Sanchez","TestAdrressC");
+		User user5 = new User("Bruce Willis","TestAdrressB");
+		User user6 = new User("Bruce Pizarro","TestAdrressB");
+		userList.add(user1);
+		userList.add(user2);
+		userList.add(user3);
+		userList.add(user4);
+		userList.add(user5);
+		userList.add(user6);
+		return userList;
+	}
+
+
+		public void IniciationFlux(){
 		Flux<String> names = Flux.just("Bladi","Claudia","L","Ivan")
 				.doOnNext(System.out::println); //doNext notifica que han llegado elementos al flujo (referencia de método)
 
@@ -86,6 +124,110 @@ public class FluxApplication implements CommandLineRunner {
 						logger.info("End execution flux");
 					}
 				});
+		//----------------------------------------------------------------------
+		// Los flujos son inmutables
+		Flux<String> names5 = Flux.just("Bladimir Pizarro","L2 Polanski","Claudia 2","L2 Eleazarix","Ivan 2","Frodo Bolson");
+		Flux<User> users5 = names.map(item -> new User(item.split(" ")[0].toUpperCase(), item.split(" ")[1].toUpperCase()))
+				.filter(user -> user.getName().toUpperCase().equals("L2"))
+				.doOnNext(user -> {
+					if(user == null){
+						throw new RuntimeException("There can be no empty user");
+					}
+					System.out.println(user.getName());
+				});
+		//Al subscribir names5 lo observamos y al cambiar a users5
+		names5.subscribe(item -> logger.info(item.toString()),
+				error -> logger.error(error.getMessage()),
+				new Runnable() {
+					@Override
+					public void run() {
+						logger.info("End execution flux");
+					}
+				});
 
-	}
+		//----------------------------------------------------------------------
+		// Flux.fromIterable
+
+		List<String> userList = userListMethod();
+
+		Flux<String> names6 = Flux.fromIterable(userList);
+
+		names6.subscribe(item -> logger.info(item.toString()),
+				error -> logger.error(error.getMessage()),
+				new Runnable() {
+					@Override
+					public void run() {
+						logger.info("End execution flux");
+					}
+				});
+		} // end IniciationFlux
+
+        public void flatMapMethod(){
+			List<String> userList = userListMethod();
+			Flux<String> names = Flux.fromIterable(userList);
+			Flux<User> usersFlux =  names.map(item -> new User(item.split(" ")[0].toUpperCase(), item.split(" ")[1].toUpperCase()))
+					.flatMap(user -> {
+						if(user.getName().equalsIgnoreCase("Bruce")){
+							String name = user.getName().toLowerCase().concat(" Sopra");
+							user.setName(name);
+							user.setAddress("Avenida Manoteras");
+							return Mono.just(user);
+						}
+						else{
+							return Mono.empty();
+						}
+					});
+					//.filter(user -> user.getName().toUpperCase().equalsIgnoreCase("Eliamertix"))
+					/*.map( user -> {
+						String name = user.getName().toLowerCase().concat(" Sopra");
+						user.setName(name);
+						user.setAddress("Avenida Manoteras");
+						return user;
+					});*/
+
+					usersFlux.subscribe(item -> logger.info(item.toString()));
+
+		} //end flatmap
+
+		//---------------------------------------------------------------------------------------
+
+	    public void mapperFlux(){
+			List<User> userList = userMethodList();
+			Flux.fromIterable(userList)
+					.map(item -> item.getName().toUpperCase().concat(" example mapper"))
+					.flatMap(nombre -> {
+						if(nombre.contains("BRUCE")){
+							return Mono.just(nombre);
+						}
+						else{
+							return Mono.empty();
+						}
+					}).subscribe(item -> logger.info(item.toString()));
+		}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
