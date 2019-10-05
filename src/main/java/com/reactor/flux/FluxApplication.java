@@ -66,5 +66,26 @@ public class FluxApplication implements CommandLineRunner {
 					}
 				});
 
+		//-----------------------------------------------------------------
+		//filter
+		Flux<User> names4 = Flux.just("Bladimir Pizarro","L2 Polanski","Claudia 2","L2 Eleazarix","Ivan 2","Frodo Bolson")
+				.map(item -> new User(item.split(" ")[0].toUpperCase(), item.split(" ")[1].toUpperCase()))
+				.filter(user -> user.getName().toUpperCase().equals("L2"))
+				.doOnNext(user -> {
+					if(user == null){
+						throw new RuntimeException("There can be no empty user");
+					}
+					System.out.println(user.getName());
+				});
+
+		names4.subscribe(item -> logger.info(item.toString()),
+				error -> logger.error(error.getMessage()),
+				new Runnable() {
+					@Override
+					public void run() {
+						logger.info("End execution flux");
+					}
+				});
+
 	}
 }
