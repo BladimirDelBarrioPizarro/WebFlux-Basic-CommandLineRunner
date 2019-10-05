@@ -24,7 +24,8 @@ public class FluxApplication implements CommandLineRunner {
 		//IniciationFlux();
 		//flatMapMethod();
 		//mapperFlux();
-		listToMonoList();
+		//listToMonoList();
+		UserCommentsFlatMap();
 	}
 
 	public List<String> userListMethod(){
@@ -219,6 +220,21 @@ public class FluxApplication implements CommandLineRunner {
 		}
 
 	//---------------------------------------------------------------------------------------
+	// fromCallable zipWith
+
+	public void UserCommentsFlatMap(){
+		Mono<User> userMono = Mono.fromCallable(() -> new User("John","Principe Vergara"));
+		Mono<Comments> commentsMono = Mono.fromCallable(() ->{
+			List<String> listComments = new ArrayList<>();
+			listComments.add("Comment 1");
+			listComments.add("Comment 2");
+			Comments comments = new Comments();
+			comments.setComments(listComments);
+			return comments;
+		});
+		Mono<UserComments> userCommentsMono = commentsMono.zipWith(userMono,(c,u) -> new UserComments(u,c));
+		userCommentsMono.subscribe(userComments -> logger.info(userComments.toString()));
+	}
 
 
 
