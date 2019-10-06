@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +27,9 @@ public class FluxApplication implements CommandLineRunner {
 		//mapperFlux();
 		//listToMonoList();
 		//UserCommentsFlatMap();
-		rangeMethod();
+		//rangeMethod();
+		//intervalMethod();
+		delayMethod();
 	}
 
 	public List<String> userListMethod(){
@@ -252,6 +255,25 @@ public class FluxApplication implements CommandLineRunner {
 	}
 
 	//---------------------------------------------------------------------------------------
+     // interval
+
+	public void intervalMethod(){
+		Flux<Integer> range = Flux.range(1,12);
+		Flux<Long> delay = Flux.interval(Duration.ofSeconds(2));
+
+		range.zipWith(delay,(r,d) -> r )
+			 .doOnNext(item -> logger.info(item.toString()))
+				.blockLast();
+
+	}
+
+	// delay
+	public void delayMethod() throws InterruptedException {
+		Flux<Integer> range = Flux.range(1,12)
+				.delayElements(Duration.ofSeconds(2))
+				.doOnNext(item -> logger.info(item.toString()));
+		range.blockLast();
+	}
 
 
 
