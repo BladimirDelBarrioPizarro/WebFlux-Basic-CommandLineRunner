@@ -25,7 +25,8 @@ public class FluxApplication implements CommandLineRunner {
 		//flatMapMethod();
 		//mapperFlux();
 		//listToMonoList();
-		UserCommentsFlatMap();
+		//UserCommentsFlatMap();
+		rangeMethod();
 	}
 
 	public List<String> userListMethod(){
@@ -232,9 +233,29 @@ public class FluxApplication implements CommandLineRunner {
 			comments.setComments(listComments);
 			return comments;
 		});
+
+		//Mapeo con flatMap
+		userMono.flatMap(item -> commentsMono.map(c -> new UserComments(item,c)));
+        //Mapeo con zipWith
 		Mono<UserComments> userCommentsMono = commentsMono.zipWith(userMono,(c,u) -> new UserComments(u,c));
 		userCommentsMono.subscribe(userComments -> logger.info(userComments.toString()));
 	}
+
+	//---------------------------------------------------------------------------------------
+    // range
+	public void rangeMethod(){
+		//Flux<Integer> ranges = Flux.range(0,4);
+		Flux.just(1,2,3,4)
+				.map(item -> item*2)
+				.zipWith(Flux.range(0,4),(one,two) -> String.format("First flux: %d, Second Flux: %d",one,two))
+				.subscribe(item -> logger.info(item.toString()));
+	}
+
+	//---------------------------------------------------------------------------------------
+
+
+
+
 
 
 
