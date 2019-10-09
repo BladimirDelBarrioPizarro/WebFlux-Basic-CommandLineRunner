@@ -1,5 +1,7 @@
 package com.reactor.flux;
 
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -35,7 +37,9 @@ public class FluxApplication implements CommandLineRunner {
 		//delayMethod();
 		//infiniteInterval();
 		//infiniteInterval2();
-		createFlux();
+		//createFlux();
+		//backPreassure();
+		backPreassure2();
 	}
 
 	public List<String> userListMethod(){
@@ -342,8 +346,52 @@ public class FluxApplication implements CommandLineRunner {
 			);
 	}
 
+    // backPressure log
+	public void backPreassure(){
+
+		Flux.range(1,10)
+				.log()
+				.subscribe(new Subscriber<Integer>() {
+
+					private Subscription subscription;
+					private Integer limit  = 5;
+					private Integer consum = 0;
+
+					@Override
+					public void onSubscribe(Subscription s) {
+						this.subscription = s;
+						s.request(Long.MAX_VALUE);
+					}
+
+					@Override
+					public void onNext(Integer integer) {
+						logger.info(integer.toString());
+						consum++;
+						if(consum == limit){
+							consum = 0;
+							subscription.request(limit);
+						}
+					}
+
+					@Override
+					public void onError(Throwable t) {
+
+					}
+
+					@Override
+					public void onComplete() {
+
+					}
+				});
+	}
 
 
+    public void backPreassure2(){
+		Flux .range(1,10)
+				.log()
+				.limitRate(2)
+				.subscribe(item -> logger.info(item.toString()));
+	}
 
 
 
