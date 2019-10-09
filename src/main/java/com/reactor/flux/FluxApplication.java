@@ -11,6 +11,7 @@ import reactor.core.publisher.Mono;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 @SpringBootApplication
 public class FluxApplication implements CommandLineRunner {
@@ -29,7 +30,8 @@ public class FluxApplication implements CommandLineRunner {
 		//UserCommentsFlatMap();
 		//rangeMethod();
 		//intervalMethod();
-		delayMethod();
+		//delayMethod();
+		infiniteInterval();
 	}
 
 	public List<String> userListMethod(){
@@ -273,6 +275,19 @@ public class FluxApplication implements CommandLineRunner {
 				.delayElements(Duration.ofSeconds(2))
 				.doOnNext(item -> logger.info(item.toString()));
 		range.blockLast();
+	}
+
+	// Intervalo infinito
+
+	public void infiniteInterval(){
+
+		CountDownLatch latch = new CountDownLatch(1);
+
+		Flux.interval(Duration.ofSeconds(1))
+				.doOnTerminate(() -> latch.countDown())
+				.map(item -> "Hola "+item)
+				.doOnNext(s -> logger.info(s))
+				.subscribe();
 	}
 
 
