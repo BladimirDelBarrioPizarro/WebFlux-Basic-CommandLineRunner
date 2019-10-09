@@ -11,6 +11,8 @@ import reactor.core.publisher.Mono;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.CountDownLatch;
 
 @SpringBootApplication
@@ -31,7 +33,9 @@ public class FluxApplication implements CommandLineRunner {
 		//rangeMethod();
 		//intervalMethod();
 		//delayMethod();
-		infiniteInterval();
+		//infiniteInterval();
+		//infiniteInterval2();
+		createFlux();
 	}
 
 	public List<String> userListMethod(){
@@ -279,19 +283,64 @@ public class FluxApplication implements CommandLineRunner {
 
 	// Intervalo infinito
 
-	public void infiniteInterval(){
+	public void infiniteInterval() throws InterruptedException {
 
 		CountDownLatch latch = new CountDownLatch(1);
 
 		Flux.interval(Duration.ofSeconds(1))
-				.doOnTerminate(() -> latch.countDown())
+				.doOnTerminate(latch::countDown)
 				.map(item -> "Hola "+item)
 				.doOnNext(s -> logger.info(s))
 				.subscribe();
+
+		latch.await();
 	}
 
 
+	public void infiniteInterval2() throws InterruptedException {
+		CountDownLatch latch = new CountDownLatch(1);
+		Flux.interval(Duration.ofSeconds(1))
+				.doOnTerminate(latch::countDown)
+				.flatMap(item -> {
+					if(item >= 5){
+						return Flux.error(new InterruptedException(" Only 5!!"));
+					}
+					return Flux.just(item);
+				})
+				.map(item -> "Hola "+item)
+				.retry(2)
+				.subscribe(item -> logger.info(item), e -> logger.error(e.getMessage()));
 
+		latch.await();
+	}
+
+    // Flux desde 0 Con Timer
+
+	public void createFlux(){
+		Flux.create(emmitter -> {
+			Timer timer = new Timer();
+			timer.schedule(new TimerTask() {
+
+				private Integer cont = 0;
+
+				@Override
+				public void run() {
+					emmitter.next(++cont);
+					if(cont == 10){
+						timer.cancel();
+						emmitter.complete();
+					}
+					if(cont == 5){
+						timer.cancel();
+						emmitter.error(new InterruptedException(" Only 5!"));
+					}
+					}
+			}, 1000, 1000);
+		}).subscribe( next -> logger.info(next.toString()),
+					error -> logger.error(error.getMessage()),
+					() -> logger.info("End flux")
+			);
+	}
 
 
 
