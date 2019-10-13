@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${title}"></title>
+</head>
+<body>
+<h1 th:text="${title}"></h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>id</th>
+            <th>date</th>
+            <th>patientId</th>
+            <th>sessionId</th>
+            <th>amount</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr th:each="billing:${billings}">
+            <td th:text="${billing.id}"></td>
+            <td th:text="${billing.date}"></td>
+            <td th:text="${billing.patientId}"></td>
+            <td th:text="${billing.sessionId}"></td>
+            <td th:text="${billing.amount}"></td>
+        </tr>
+    </tbody>
+</table>
+
+
+</body>
+</html>

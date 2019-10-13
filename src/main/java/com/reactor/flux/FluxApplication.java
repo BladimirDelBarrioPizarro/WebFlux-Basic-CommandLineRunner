@@ -367,7 +367,7 @@ public class FluxApplication implements CommandLineRunner {
 					public void onNext(Integer integer) {
 						logger.info(integer.toString());
 						consum++;
-						if(consum == limit){
+						if(consum.equals(limit)){
 							consum = 0;
 							subscription.request(limit);
 						}
@@ -392,24 +392,4 @@ public class FluxApplication implements CommandLineRunner {
 				.limitRate(2)
 				.subscribe(item -> logger.info(item.toString()));
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
