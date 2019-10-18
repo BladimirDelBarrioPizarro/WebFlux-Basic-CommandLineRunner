@@ -2,7 +2,6 @@ package com.webflux.app.controller.impl;
 
 import com.webflux.app.dao.BillingDao;
 import com.webflux.app.model.entity.Billing;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -11,15 +10,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.thymeleaf.spring5.context.webflux.ReactiveDataDriverContextVariable;
 import reactor.core.publisher.Flux;
 
-import java.text.SimpleDateFormat;
 import java.time.Duration;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Date;
 
 @Slf4j
 @Controller
-public class BillingControllerImpl{
+public class BillingControllerImpl {
     private BillingDao billingDao;
 
     @Autowired
