@@ -4,6 +4,8 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 
@@ -13,7 +15,7 @@ import java.util.Date;
 public class Billing {
     @Id
     private String id;
-    private Date date;
+    private String date;
     private Integer patientId;
     private Integer sessionId;
     private Integer amount;

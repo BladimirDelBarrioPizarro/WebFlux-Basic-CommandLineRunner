@@ -12,6 +12,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import reactor.core.publisher.Flux;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 
@@ -40,7 +43,9 @@ public class AppApplication implements CommandLineRunner {
 				new Billing( 3, 112, 30)
 		)
 				.flatMap(item -> {
-					item.setDate(new Date());
+					SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy");
+					String dateStr = DATE_FORMAT.format(new Date());
+					item.setDate(dateStr);
 					return billingDao.save(item);
 				})
 				.subscribe(item -> logg.info("Insert: "+item.toString()));
